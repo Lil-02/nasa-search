@@ -1,11 +1,12 @@
 import { LitElement, html, css } from 'lit';
 import "./nasa-image.js";
+
 export class NasaSearch extends LitElement {
   static get properties() {
     return {
       title: { type: String },
       loading: { type: Boolean, reflect: true },
-      items: { type: Array, },
+      items: { type: Array },
       value: { type: String },
     };
   }
@@ -31,7 +32,7 @@ export class NasaSearch extends LitElement {
       details {
         margin: 16px;
         padding: 16px;
-        background-color: blue;
+        background-color: pink;
       }
       summary {
         font-size: 24px;
@@ -57,55 +58,61 @@ export class NasaSearch extends LitElement {
 
   render() {
     return html`
-    <h2>${this.title}</h2>
-    <details open>
-      <summary>Search inputs</summary>
-      <div>
-        <input id="input" placeholder="Search NASA images" @input="${this.inputChanged}" />
+      <h2>${this.title}</h2>
+      <details open>
+        <summary>Search inputs</summary>
+        <div>
+          <input id="input" placeholder="Search NASA images" @input="${this.inputChanged}" />
+        </div>
+      </details>
+      <div class="results">
+        ${this.items.map((item, index) => html`
+          <nasa-image
+            source="${item.links[0].href}"
+            title="${item.data[0].title}"
+            alt="${item.data[0].description || 'NASA image'}"
+            secondary_creator="${item.data[0].secondary_creator || 'no se, lo siento'}"
+          ></nasa-image>
+        `)}
       </div>
-    </details>
-    <div class="results">
-      ${this.items.map((item, index) => html`
-      <nasa-image
-        source="${item.links[0].href}"
-        title="${item.data[0].title}"
-      ></nasa-image>
-      `)}
-    </div>
     `;
   }
 
   inputChanged(e) {
     this.value = this.shadowRoot.querySelector('#input').value;
   }
+
   // life cycle will run when anything defined in `properties` is modified
   updated(changedProperties) {
-    // see if value changes from user input and is not empty
     if (changedProperties.has('value') && this.value) {
       this.updateResults(this.value);
-    }
-    else if (changedProperties.has('value') && !this.value) {
+    } else if (changedProperties.has('value') && !this.value) {
       this.items = [];
-    }
-    // @debugging purposes only
-    if (changedProperties.has('items') && this.items.length > 0) {
-      console.log(this.items);
     }
   }
 
   updateResults(value) {
     this.loading = true;
-    fetch(`https://images-api.nasa.gov/search?media_type=image&q=${value}`).then(d => d.ok ? d.json(): {}).then(data => {
-      if (data.collection) {
-        this.items = [];
-        this.items = data.collection.items;
-        this.loading = false;
-      }  
-    });
+    fetch(`https://images-api.nasa.gov/search?media_type=image&q=${value}`)
+      .then((response) => (response.ok ? response.json() : {}))
+      .then((data) => {
+        if (data.collection) {
+          this.items = data.collection.items.map((item) => {
+            // Ensure secondary_creator exists, fallback to 'Unknown' if not available
+            const secondary_creator = item.data[0].secondary_creator || 'no se, lo siento';
+            return {
+              ...item,
+              data: [{ ...item.data[0], secondary_creator }],
+            };
+          });
+          this.loading = false;
+        }
+      });
   }
 
   static get tag() {
     return 'nasa-search';
   }
 }
+
 customElements.define(NasaSearch.tag, NasaSearch);
