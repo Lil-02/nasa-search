@@ -82,7 +82,7 @@ export class NasaSearch extends LitElement {
     this.value = this.shadowRoot.querySelector('#input').value;
   }
 
-  // life cycle will run when anything defined in `properties` is modified
+  
   updated(changedProperties) {
     if (changedProperties.has('value') && this.value) {
       this.updateResults(this.value);
@@ -98,7 +98,7 @@ export class NasaSearch extends LitElement {
       .then((data) => {
         if (data.collection) {
           this.items = data.collection.items.map((item) => {
-            // Ensure secondary_creator exists, fallback to 'Unknown' if not available
+            
             const secondary_creator = item.data[0].secondary_creator || 'no se, lo siento';
             return {
               ...item,
