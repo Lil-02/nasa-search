@@ -1,43 +1,36 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <base href="/">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="Description" content="Demonstration for nasa-search">
+  <meta name="Description" content="Demonstration for NASA Image Search">
 
   <style>
     :root, html, body {
       margin: 0;
       padding: 0;
+      font-family: Arial, sans-serif;
     }
     #demo {
-      margin: var(--ddd-spacing-2);
+      margin: 16px;
     }
     nasa-search {
-      margin: var(--ddd-spacing-2);
-      border: var(--ddd-border-md);
-      border-radius: var(--ddd-radius-lg);
-    }
-    nasa-search:hover {
-      box-shadow: var(--ddd-boxShadow-sm);
-
-      
+      margin: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
     }
     #example {
-      --nasa-search-font-size: var(--ddd-font-size-l);
-      background-color: var(--ddd-accent-2);
-      color: var(--ddd-primary-17);
+      --nasa-search-font-size: 18px;
+      background-color: #f0f0f0;
+      color: #333;
     }
   </style>
-  <title>nasa-search</title>
+  <title>NASA Image Search</title>
 </head>
-
 <body>
   <div id="demo">
-    <h1>nasa-search</h1>
-    
+    <h1>NASA Image Search</h1>
     <nasa-search></nasa-search>
   </div>
   <script type="module" src="./nasa-search.js"></script>
