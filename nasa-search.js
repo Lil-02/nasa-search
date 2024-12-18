@@ -15,35 +15,51 @@ export class NasaSearch extends LitElement {
     return css`
       :host {
         display: block;
+        font-family: Arial, sans-serif;
       }
       :host([loading]) .results {
         opacity: 0.1;
         visibility: hidden;
-        height: 1px;
       }
+
       .results {
         visibility: visible;
-        height: 100%;
         opacity: 1;
-        transition-delay: .5s;
-        transition: .5s all ease-in-out;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      .loading-message {
+        font-size: 18px;
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .no-results {
+        font-size: 18px;
+        text-align: center;
+        color: #888;
+        margin-top: 20px;
       }
 
       details {
         margin: 16px;
         padding: 16px;
-        background-color: pink;
+        background-color: #f9f9f9;
       }
+
       summary {
         font-size: 24px;
         padding: 8px;
-        color: white;
-        font-size: 42px;
+        color: #333;
+        font-weight: bold;
       }
+
       input {
         font-size: 20px;
         line-height: 40px;
         width: 100%;
+        padding: 10px;
+        margin-top: 10px;
       }
     `;
   }
@@ -51,7 +67,7 @@ export class NasaSearch extends LitElement {
   constructor() {
     super();
     this.value = null;
-    this.title = '';
+    this.title = 'NASA Image Search';
     this.loading = false;
     this.items = [];
   }
@@ -60,18 +76,25 @@ export class NasaSearch extends LitElement {
     return html`
       <h2>${this.title}</h2>
       <details open>
-        <summary>Search inputs</summary>
+        <summary>Search for NASA Images</summary>
         <div>
           <input id="input" placeholder="Search NASA images" @input="${this.inputChanged}" />
         </div>
       </details>
+
+      <!-- Show loading spinner if fetching data -->
+      ${this.loading ? html`<div class="loading-message">Loading results...</div>` : ''}
+      
+      <!-- Show no results message -->
+      ${this.items.length === 0 && !this.loading ? html`<div class="no-results">No results found.</div>` : ''}
+
       <div class="results">
-        ${this.items.map((item, index) => html`
+        ${this.items.map((item) => html`
           <nasa-image
             source="${item.links[0].href}"
             title="${item.data[0].title}"
             alt="${item.data[0].description || 'NASA image'}"
-            secondary_creator="${item.data[0].secondary_creator || 'no se, lo siento'}"
+            secondary_creator="${item.data[0].secondary_creator || 'No creator available'}"
           ></nasa-image>
         `)}
       </div>
@@ -82,7 +105,6 @@ export class NasaSearch extends LitElement {
     this.value = this.shadowRoot.querySelector('#input').value;
   }
 
-  
   updated(changedProperties) {
     if (changedProperties.has('value') && this.value) {
       this.updateResults(this.value);
@@ -98,8 +120,7 @@ export class NasaSearch extends LitElement {
       .then((data) => {
         if (data.collection) {
           this.items = data.collection.items.map((item) => {
-            
-            const secondary_creator = item.data[0].secondary_creator || 'no se, lo siento';
+            const secondary_creator = item.data[0].secondary_creator || 'No creator available';
             return {
               ...item,
               data: [{ ...item.data[0], secondary_creator }],
@@ -107,6 +128,10 @@ export class NasaSearch extends LitElement {
           });
           this.loading = false;
         }
+      })
+      .catch(() => {
+        this.loading = false;
+        this.items = [];
       });
   }
 

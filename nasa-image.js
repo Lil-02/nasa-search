@@ -24,27 +24,31 @@ export class NasaImage extends DDDSuper(LitElement) {
       .image-card {
         display: inline-block;
         width: 240px;
-        height: auto;
+        height: 300px;  /* Fixed height to match the spec */
         border: 1px solid #ccc;
         padding: 16px;
         margin: 8px;
-        transition: background-color 0.3s ease;
+        transition: background-color 0.3s ease, transform 0.2s ease;
         cursor: pointer;
         text-align: center;
+        border-radius: 8px;
       }
 
       .image-card:hover {
         background-color: #f0f0f0;
+        transform: scale(1.05);
       }
 
       .image-card:focus {
-        outline: none;
-        background-color: #d0e0ff;
+        outline: 3px solid #005fcc;
+        background-color: #e0eaff;
       }
 
       .image img {
-        width: 240px;
-        height: auto;
+        width: 100%;
+        height: 150px;
+        object-fit: cover;  /* Ensure the image fits the container */
+        border-radius: 4px;
       }
 
       .image div {
@@ -58,6 +62,12 @@ export class NasaImage extends DDDSuper(LitElement) {
         font-size: 14px;
         color: #714343;
       }
+
+      .no-image {
+        font-size: 14px;
+        color: #999;
+        margin-top: 10px;
+      }
     `];
   }
 
@@ -67,7 +77,7 @@ export class NasaImage extends DDDSuper(LitElement) {
         <div class="image">
           <img src="${this.source}" alt="${this.alt}" />
           <div>${this.title}</div>
-          <div class="creator">By: ${this.secondary_creator}</div>
+          <div class="creator">By: ${this.secondary_creator || 'Unknown Creator'}</div>
         </div>
       </div>
     `;
